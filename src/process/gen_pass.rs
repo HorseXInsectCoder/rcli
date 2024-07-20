@@ -1,5 +1,7 @@
 use rand::seq::SliceRandom;
 
+use zxcvbn::zxcvbn;
+
 const UPPER: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ"; // 大写的 I 和小写的 l 也不做为密码, O和0也一样
 const LOWER: &[u8] = b"abcdefghijkmnopqrstuvwxyz";
 const NUMBER: &[u8] = b"123456789";
@@ -47,7 +49,15 @@ pub fn process_genpass(
 
     password.shuffle(&mut rng);
 
-    println!("{:?}", String::from_utf8(password)?);
+    let password = String::from_utf8(password)?;
+    println!("{}", password);
+
+    let estimate = zxcvbn(&password, &[])?;
+
+    // 用 eprintln 是为了输出到 std error，如果程序需要输出密码到文件，如 cargo run -- genpass > out.txt
+    // 不会与 std out 的数据混合，即运行 cargo run -- genpass > out.txt，只会输出 Password strength
+    // 如果用 println 的话，在输出到文件时，会把 println 的内容也输出到文件
+    eprintln!("Password strength: {}", estimate.score()); // 16位的长度是4，4表示足够强了
 
     // Ok(String::from_utf8(password)?)
     Ok(String::new())

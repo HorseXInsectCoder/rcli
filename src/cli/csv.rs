@@ -1,24 +1,9 @@
 use core::fmt;
-use std::{path::Path, str::FromStr};
+use std::str::FromStr;
 
 use clap::Parser;
 
-#[derive(Debug, Parser)]
-#[command(name = "cli", version, author, about, long_about = None)] // 这些信息会自动从 Cargo.toml 读取
-pub struct Opts {
-    #[command(subcommand)]
-    pub cmd: Subcommand,
-}
-
-#[derive(Debug, Parser)]
-pub enum Subcommand {
-    // name 可以不指定，默认就是转成小写
-    #[command(name = "csv", about = "Convert CSV to other format")]
-    Csv(CsvOpts),
-
-    #[command(name = "genpass", about = "generate a random password")]
-    GenPass(GenPassOpts),
-}
+use super::verify_input_file;
 
 #[derive(Debug, Copy, Clone)]
 pub enum OutputFormat {
@@ -46,32 +31,6 @@ pub struct CsvOpts {
 
     #[arg(long, default_value = "json", value_parser = parse_format)]
     pub format: OutputFormat,
-}
-
-#[derive(Debug, Parser)]
-pub struct GenPassOpts {
-    #[arg(short, long, default_value_t = 16)]
-    pub length: u8,
-
-    #[arg(long, default_value_t = true)]
-    pub uppercase: bool,
-
-    #[arg(long, default_value_t = true)]
-    pub lowercase: bool,
-
-    #[arg(long, default_value_t = true)]
-    pub number: bool,
-
-    #[arg(long, default_value_t = true)]
-    pub symbol: bool,
-}
-
-fn verify_input_file(filename: &str) -> Result<String, String> {
-    if Path::new(filename).exists() {
-        Ok(filename.into())
-    } else {
-        Err("File does not exists".into())
-    }
 }
 
 // anyhow::Error 可以转为 String 输出到命令行

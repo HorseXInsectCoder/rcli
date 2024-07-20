@@ -7,7 +7,7 @@ use std::fs;
 
 use anyhow::Result;
 
-use crate::opts::OutputFormat;
+use crate::cli::OutputFormat;
 
 // juventus.csv 的字段结构
 #[derive(Debug, Deserialize, Serialize)]
