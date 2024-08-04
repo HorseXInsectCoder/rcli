@@ -60,5 +60,5 @@ pub fn process_genpass(
     eprintln!("Password strength: {}", estimate.score()); // 16位的长度是4，4表示足够强了
 
     // Ok(String::from_utf8(password)?)
-    Ok(String::new())
+    Ok(password)
 }

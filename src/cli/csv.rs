@@ -3,7 +3,7 @@ use std::str::FromStr;
 
 use clap::Parser;
 
-use super::verify_input_file;
+use super::verify_file;
 
 #[derive(Debug, Copy, Clone)]
 pub enum OutputFormat {
@@ -14,7 +14,7 @@ pub enum OutputFormat {
 #[derive(Debug, Parser)]
 pub struct CsvOpts {
     // 对 input 做合法性检查，可以写自定义函数或者使用 clap 自带的
-    #[arg(short, long, value_parser = verify_input_file)]
+    #[arg(short, long, value_parser = verify_file)]
     pub input: String,
 
     // default_value 的展开是："output.json".into()，因为 "output.json" 是一个 &str，而 output 要求一个 String
