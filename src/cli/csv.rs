@@ -1,9 +1,8 @@
+use super::verify_file;
+use crate::{process_csv, CmdExector};
+use clap::Parser;
 use core::fmt;
 use std::str::FromStr;
-
-use clap::Parser;
-
-use super::verify_file;
 
 #[derive(Debug, Copy, Clone)]
 pub enum OutputFormat {
@@ -45,6 +44,17 @@ fn parse_format(format: &str) -> Result<OutputFormat, anyhow::Error> {
 
     // parse 可以把 String 解析成其他的数据类型，前提是这个数据类型实现了 FromStr
     format.parse()
+}
+
+impl CmdExector for CsvOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let output: String = if let Some(output) = self.output {
+            output
+        } else {
+            format!("output.{}", self.format)
+        };
+        process_csv(&self.input, output, self.format)
+    }
 }
 
 impl From<OutputFormat> for &'static str {

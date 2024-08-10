@@ -1,14 +1,9 @@
-use serde::{Deserialize, Serialize};
-
-use csv::Reader;
-use serde_json::Value;
-
-use std::fs;
-
-use anyhow::Result;
-
 use crate::cli::OutputFormat;
-
+use anyhow::Result;
+use csv::Reader;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::fs;
 // juventus.csv 的字段结构
 #[derive(Debug, Deserialize, Serialize)]
 struct Player {

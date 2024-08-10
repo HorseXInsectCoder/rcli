@@ -1,5 +1,4 @@
 use rand::seq::SliceRandom;
-
 use zxcvbn::zxcvbn;
 
 const UPPER: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ"; // 大写的 I 和小写的 l 也不做为密码, O和0也一样

@@ -4,17 +4,12 @@ mod genpass_opts;
 mod http;
 mod text;
 
-use self::{csv::CsvOpts, genpass_opts::GenPassOpts};
 use clap::Parser;
+use enum_dispatch::enum_dispatch;
 use std::path::{Path, PathBuf};
 
 // 这里用 self::csv 的原因是，如果不用 self 的话，会与 Cargo.toml 里的 csv crate 冲突
-pub use self::{
-    base64::{Base64Format, Base64SubCommand},
-    csv::OutputFormat,
-    http::HttpSubCommand,
-    text::{TextSignFormat, TextSubCommand},
-};
+pub use self::{base64::*, csv::*, genpass_opts::*, http::*, text::*};
 
 #[derive(Debug, Parser)]
 #[command(name = "cli", version, author, about, long_about = None)] // 这些信息会自动从 Cargo.toml 读取
@@ -24,6 +19,7 @@ pub struct Opts {
 }
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum Subcommand {
     // name 可以不指定，默认就是转成小写
     #[command(name = "csv", about = "Convert CSV to other format")]
@@ -32,15 +28,29 @@ pub enum Subcommand {
     #[command(name = "genpass", about = "generate a random password")]
     GenPass(GenPassOpts),
 
-    #[command(subcommand)]
+    #[command(subcommand, about = "Base encode/decode")]
     Base64(Base64SubCommand),
 
-    #[command(subcommand)]
+    #[command(subcommand, about = "Text Sign/verify")]
     Text(TextSubCommand),
 
-    #[command(subcommand)]
+    #[command(subcommand, about = "HTTP Server")]
     Http(HttpSubCommand),
 }
+
+// 可以删除
+// impl CmdExector for Subcommand {
+//     async fn execute(self) -> anyhow::Result<()> {
+//         match self {
+//             Subcommand::Csv(opts) => opts.execute().await,
+//             Subcommand::GenPass(opts) => opts.execute().await,
+//             Subcommand::Base64(cmd) => cmd.execute().await,
+//             Subcommand::Text(cmd) => cmd.execute().await,
+//             Subcommand::Http(cmd) => cmd.execute().await,
+//         };
+//         Ok(())
+//     }
+// }
 
 // 把方法从 csv 模块提到这里，让 mod 下面所有模块都可以使用
 fn verify_file(filename: &str) -> Result<String, &'static str> {

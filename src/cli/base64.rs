@@ -1,11 +1,12 @@
+use super::verify_file;
+use crate::{get_reader, process_decode, process_encode, CmdExector};
+use clap::Parser;
 use core::fmt;
+use enum_dispatch::enum_dispatch;
 use std::str::FromStr;
 
-use clap::Parser;
-
-use super::verify_file;
-
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum Base64SubCommand {
     #[command(name = "encode", about = "Encode a string to base64")]
     Encode(Base64EncodeOpts),
@@ -38,6 +39,33 @@ pub enum Base64Format {
     Standard,
     UrlSafe,
 }
+
+impl CmdExector for Base64EncodeOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let mut reader = get_reader(&self.input)?;
+        let ret = process_encode(&mut reader, self.format)?;
+        println!("{:?}", ret);
+        Ok(())
+    }
+}
+
+impl CmdExector for Base64DecodeOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let mut reader = get_reader(&self.input)?;
+        let ret = process_decode(&mut reader, self.format)?;
+        println!("{:?}", ret);
+        Ok(())
+    }
+}
+
+// impl CmdExector for Base64SubCommand {
+//     async fn execute(self) -> anyhow::Result<()> {
+//         match self {
+//             Base64SubCommand::Encode(opts) => opts.execute().await,
+//             Base64SubCommand::Decode(opts) => opts.execute().await,
+//         }
+//     }
+// }
 
 fn parse_base64_format(format: &str) -> anyhow::Result<Base64Format, anyhow::Error> {
     format.parse()

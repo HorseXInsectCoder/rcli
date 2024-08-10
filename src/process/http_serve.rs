@@ -1,5 +1,3 @@
-use std::{net::SocketAddr, path::PathBuf, sync::Arc};
-
 use anyhow::Result;
 use axum::{
     extract::{Path, State},
@@ -7,10 +5,10 @@ use axum::{
     routing::get,
     Router,
 };
+use std::{net::SocketAddr, path::PathBuf, sync::Arc};
 use tokio::net::TcpListener;
-use tracing::{info, warn};
-
 use tower_http::services::ServeDir;
+use tracing::{info, warn};
 
 #[derive(Debug)]
 struct HttpServeState {
@@ -23,7 +21,7 @@ pub async fn process_http_serve(path: PathBuf, port: u16) -> Result<()> {
 
     info!("Serving {:?} on port {}", path, addr);
 
-    let state = HttpServeState { path: path.clone() };
+    let state: HttpServeState = HttpServeState { path: path.clone() };
 
     let dir_service = ServeDir::new(path)
         .append_index_html_on_directories(true)
